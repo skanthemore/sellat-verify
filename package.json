@@ -1,0 +1,35 @@
+{
+  "name": "sellat-verify",
+  "version": "0.1.0",
+  "description": "Offline verifier for SELLAT proof-of-existence artifacts (sellat-proof/2). Zero dependencies.",
+  "type": "module",
+  "bin": {
+    "sellat-verify": "bin/sellat-verify.mjs"
+  },
+  "exports": {
+    ".": "./src/verify.mjs",
+    "./merkle": "./src/merkle.mjs"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "timestamping",
+    "proof-of-existence",
+    "merkle",
+    "blockchain",
+    "polygon",
+    "verification",
+    "integrity"
+  ],
+  "author": "Cristian Cascante",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skanthemore/sellat-verify.git"
+  },
+  "homepage": "https://sellat.app"
+}

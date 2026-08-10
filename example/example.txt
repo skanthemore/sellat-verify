@@ -1,0 +1,2 @@
+This exact file was anchored to Polygon mainnet through SELLAT (sellat.app).
+If a single byte of this file changes, verification fails.

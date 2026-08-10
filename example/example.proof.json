@@ -1,0 +1,32 @@
+{
+  "schema": "sellat-proof/2",
+  "proof_id": "d268831c-4c70-4226-97d9-bf1cd703d365",
+  "content": {
+    "algorithm": "SHA-256",
+    "hash": "2ad295bdf52f661acda66158a7b20fc7c982e190b2645117ea6a77583703e291"
+  },
+  "leaf": {
+    "formula": "SHA-256('sellat-leaf:v2:' + proof_id + ':' + content.hash)",
+    "value": "3c6e1005a0cb26993e3b445e5c755d75bc89ab60012cf8670cdd9c279b78b05c"
+  },
+  "merkle": {
+    "index": 0,
+    "path": [],
+    "root": "3c6e1005a0cb26993e3b445e5c755d75bc89ab60012cf8670cdd9c279b78b05c"
+  },
+  "anchors": [
+    {
+      "chain_id": 137,
+      "network": "Polygon Mainnet",
+      "tx_hash": "0xdeb68fad7312db74275cbcc72533f3a60899aea2f35da660c15e5867b9f41903",
+      "block_number": 91797318,
+      "block_hash": "0x71fb162542659f2faee9f1c58c69c1cedc0d6ba1237f68c979de42d5ddfab4d6",
+      "block_timestamp": "2026-08-10T22:30:04.000Z",
+      "payload": "sellat:v2:3c6e1005a0cb26993e3b445e5c755d75bc89ab60012cf8670cdd9c279b78b05c"
+    }
+  ],
+  "times": {
+    "sellat_received_at": "2026-08-10T22:29:54.618Z",
+    "note": "block_timestamp is the independently verifiable time; sellat_received_at is SELLAT's own record time"
+  }
+}
