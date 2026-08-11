@@ -93,6 +93,14 @@ Steps 1–4 are pure computation. Step 5 works against any node or explorer.
 The full format is specified in [SPEC.md](SPEC.md) and is frozen: issued
 proofs verify forever; format changes require a new schema version.
 
+## Trust layers
+
+Artifacts can carry more than one independent layer over the same Merkle
+root: EVM anchors (`anchors[]`, e.g. Polygon in minutes) and optional
+`attestations[]` — currently **Bitcoin via OpenTimestamps**, a standard
+`.ots` file you can verify with OTS tooling, at no cost. Layers verify
+separately; none depends on SELLAT or on each other. See SPEC.md §7.
+
 ## What a proof does and does not claim
 
 A sellat-proof/2 artifact proves **existence and integrity at a point in
