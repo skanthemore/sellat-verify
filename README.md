@@ -1,5 +1,7 @@
 # sellat-verify
 
+[![tests](https://github.com/skanthemore/sellat-verify/actions/workflows/tests.yml/badge.svg)](https://github.com/skanthemore/sellat-verify/actions/workflows/tests.yml)
+
 **Don't trust SELLAT. Verify.**
 
 `sellat-verify` is a standalone, **zero-dependency** verifier for
@@ -79,6 +81,24 @@ As a library:
 ```js
 import { verifyProofOffline, checkAnchorOnChain } from 'sellat-verify';
 ```
+
+### Verify in CI
+
+This repository is also a composite GitHub Action, so a pipeline can prove
+its own artifacts verify before shipping them:
+
+```yaml
+- uses: skanthemore/sellat-verify@main
+  with:
+    file: release/build.tar.gz
+    proof: release/build.proof.json
+    # offline: 'true'        # math only, skip the on-chain check
+    # rpc: https://…         # or pin the check to a node you control
+```
+
+The job fails if the proof does not verify. Pair it with
+[`sellat-cli`](https://github.com/skanthemore/sellat-cli) to stamp the
+artifact in the same pipeline.
 
 ## How verification works
 

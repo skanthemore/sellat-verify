@@ -1,0 +1,37 @@
+name: 'sellat-verify'
+description: 'Verify a SELLAT proof-of-existence artifact (sellat-proof/2) against a file. Zero dependencies.'
+branding:
+  icon: 'check-circle'
+  color: 'blue'
+
+inputs:
+  file:
+    description: 'Path to the file whose existence is being proven'
+    required: true
+  proof:
+    description: 'Path to the proof.json artifact'
+    required: true
+  offline:
+    description: 'Set to "true" to skip the on-chain RPC check (math only)'
+    required: false
+    default: 'false'
+  rpc:
+    description: 'Custom JSON-RPC endpoint for the on-chain check'
+    required: false
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Verify proof
+      shell: bash
+      env:
+        INPUT_FILE: ${{ inputs.file }}
+        INPUT_PROOF: ${{ inputs.proof }}
+        INPUT_OFFLINE: ${{ inputs.offline }}
+        INPUT_RPC: ${{ inputs.rpc }}
+      run: |
+        set -- "$INPUT_FILE" "$INPUT_PROOF"
+        [ "$INPUT_OFFLINE" = "true" ] && set -- "$@" --offline
+        [ -n "$INPUT_RPC" ] && set -- "$@" "--rpc=$INPUT_RPC"
+        node "${{ github.action_path }}/bin/sellat-verify.mjs" "$@"

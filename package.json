@@ -13,6 +13,11 @@
   "scripts": {
     "test": "node --test"
   },
+  "files": [
+    "bin",
+    "src",
+    "SPEC.md"
+  ],
   "engines": {
     "node": ">=18"
   },

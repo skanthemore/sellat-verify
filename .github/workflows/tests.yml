@@ -1,0 +1,22 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [18, 20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: node --test
+      # The shipped example is a real proof anchored on Polygon mainnet;
+      # verifying it offline on every push keeps README and reality in sync.
+      - run: node bin/sellat-verify.mjs example/example.txt example/example.proof.json --offline
