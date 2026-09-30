@@ -130,11 +130,31 @@ content is true or authentic. In a world where anything can be fabricated
 *now*, the only unforgeable thing is the past — that is exactly what this
 verifies, and nothing more.
 
+## Getting a proof
+
+Proofs come from the [SELLAT API v2](https://sellat.app/en/developers/docs)
+(or the web app). From your own systems — only the SHA-256 leaves your machine:
+
+```console
+$ curl https://sellat.app/api/v2/proofs \
+    -H "Authorization: Bearer $SELLAT_API_TOKEN" \
+    -H "Content-Type: application/json" \
+    -d "{\"hash\":\"$(sha256sum build.tar.gz | cut -d' ' -f1)\",\"name\":\"build.tar.gz\"}"
+
+# once anchored (a few minutes), the portable proof is public — no key needed
+$ curl -o build.proof.json https://sellat.app/api/v2/proof/<id>.json
+$ sellat-verify build.tar.gz build.proof.json
+```
+
+- API reference: <https://sellat.app/en/developers/docs>
+- OpenAPI 3.1: <https://sellat.app/developers/openapi.json> — import it into
+  Postman, Insomnia or an SDK generator.
+
 ## About
 
 Built by [SELLAT](https://sellat.app) — proof of existence for one file or a
-million, on the same engine. The hosted product is rolling out `proof.json`
-downloads for every proof; this verifier and the format specification are the
+million, on the same engine. Every proof, created on the web or through the
+API, has its `proof.json`; this verifier and the format specification are the
 stable, public reference.
 
 MIT licensed. Issues and PRs welcome.
