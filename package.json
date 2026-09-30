@@ -1,6 +1,6 @@
 {
   "name": "sellat-verify",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Offline verifier for SELLAT proof-of-existence artifacts (sellat-proof/2). Zero dependencies.",
   "type": "module",
   "bin": {

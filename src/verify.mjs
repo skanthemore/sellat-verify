@@ -121,23 +121,42 @@ export async function checkAnchorOnChain(anchor, options = {}) {
     return { ok: false, detail: `no RPC endpoint known for chain_id ${anchor?.chain_id}; pass --rpc` };
   }
 
-  const response = await fetchImpl(rpcUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      jsonrpc: '2.0',
-      id: 1,
-      method: 'eth_getTransactionByHash',
-      params: [anchor.tx_hash],
-    }),
-  });
+  const call = async (method, params) => {
+    const response = await fetchImpl(rpcUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
+    });
+    if (!response.ok) {
+      return { error: `RPC ${rpcUrl} answered HTTP ${response.status}` };
+    }
+    const body = await response.json();
+    return { result: body?.result ?? null };
+  };
 
-  if (!response.ok) {
-    return { ok: false, detail: `RPC ${rpcUrl} answered HTTP ${response.status}` };
+  const byHash = await call('eth_getTransactionByHash', [anchor.tx_hash]);
+  if (byHash.error) {
+    return { ok: false, detail: byHash.error };
+  }
+  let tx = byHash.result;
+
+  // Many public nodes keep every block but index transactions by hash only
+  // for recent ones, so an anchor a few weeks old comes back as null. The
+  // proof names its block: read that block and look for the transaction in it.
+  if (!tx && anchor.block_number != null) {
+    const block = await call('eth_getBlockByNumber', ['0x' + Number(anchor.block_number).toString(16), true]);
+    if (block.error) {
+      return { ok: false, detail: block.error };
+    }
+    const wanted = String(anchor.tx_hash).toLowerCase();
+    const found = (block.result?.transactions ?? []).find(
+      (candidate) => typeof candidate === 'object' && String(candidate.hash).toLowerCase() === wanted,
+    );
+    if (found) {
+      tx = { ...found, blockNumber: found.blockNumber ?? block.result.number };
+    }
   }
 
-  const body = await response.json();
-  const tx = body?.result;
   if (!tx) {
     return { ok: false, detail: `transaction ${anchor.tx_hash} not found on chain ${anchor.chain_id}` };
   }

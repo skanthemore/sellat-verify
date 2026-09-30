@@ -76,3 +76,50 @@ test('on-chain check rejects a missing transaction', async () => {
   });
   assert.equal(result.ok, false);
 });
+
+// Public nodes often answer null to eth_getTransactionByHash for anything but
+// recent transactions, while still serving the block. The proof's block
+// number is enough to find the anchor anyway.
+const rpcRouter = (answers) => async (_url, init) => {
+  const { method } = JSON.parse(init.body);
+  return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result: answers[method] ?? null }));
+};
+
+test('on-chain check finds an old anchor through its block when the node lost the hash index', async () => {
+  const anchor = exampleProof.anchors[0];
+  const inBlock = {
+    hash: anchor.tx_hash.toUpperCase().replace('0X', '0x'),
+    input: '0x' + Buffer.from(anchor.payload, 'utf8').toString('hex'),
+    from: '0x33167f8eeb4299d0b357a7687b0fdda1f0d46972',
+  };
+  const fetchImpl = rpcRouter({
+    eth_getTransactionByHash: null,
+    eth_getBlockByNumber: { number: '0x' + anchor.block_number.toString(16), transactions: [{ hash: '0x' + 'a'.repeat(64) }, inBlock] },
+  });
+  const result = await checkAnchorOnChain(anchor, { rpcUrl: 'https://fake.rpc', fetchImpl });
+  assert.equal(result.ok, true);
+  assert.equal(result.blockNumber, anchor.block_number);
+});
+
+test('on-chain check still rejects an anchor that is not in the named block', async () => {
+  const anchor = exampleProof.anchors[0];
+  const fetchImpl = rpcRouter({
+    eth_getTransactionByHash: null,
+    eth_getBlockByNumber: { number: '0x' + anchor.block_number.toString(16), transactions: [{ hash: '0x' + 'b'.repeat(64) }] },
+  });
+  const result = await checkAnchorOnChain(anchor, { rpcUrl: 'https://fake.rpc', fetchImpl });
+  assert.equal(result.ok, false);
+});
+
+test('on-chain check still rejects a payload found through the block that does not match', async () => {
+  const anchor = exampleProof.anchors[0];
+  const fetchImpl = rpcRouter({
+    eth_getTransactionByHash: null,
+    eth_getBlockByNumber: {
+      number: '0x' + anchor.block_number.toString(16),
+      transactions: [{ hash: anchor.tx_hash, input: '0x' + Buffer.from('sellat:v2:' + '0'.repeat(64), 'utf8').toString('hex') }],
+    },
+  });
+  const result = await checkAnchorOnChain(anchor, { rpcUrl: 'https://fake.rpc', fetchImpl });
+  assert.equal(result.ok, false);
+});
