@@ -76,9 +76,13 @@ SELLAT's own record time and is intentionally weaker evidence.
 4. `anchors[i].payload == "sellat:v2:" + merkle.root` for every anchor;
 5. for at least one anchor, fetch `tx_hash` from any node of that chain and
    check that the transaction's input data equals `payload` (and, if desired,
-   that the block number matches and is final).
+   that the block number matches and is final);
+6. read that block's timestamp from the same node. **That is the proven
+   time**; `anchors[i].block_timestamp` is only what the artifact claims, and
+   a verifier must reject an anchor whose claim differs from the block, and
+   must never present the claim as verified.
 
-Steps 1–4 are offline. Step 5 needs any JSON-RPC endpoint or block explorer —
+Steps 1–4 are offline and prove no date. Steps 5–6 need any JSON-RPC endpoint or block explorer —
 the verifier never contacts SELLAT.
 
 ## 6. What this format does NOT claim
