@@ -68,11 +68,13 @@ That root sits in Polygon block **91797318**, timestamped
 
 ```console
 $ sellat-verify <file> <proof.json>              # offline checks + on-chain check
-$ sellat-verify <file> <proof.json> --offline    # math only, no network
+$ sellat-verify <file> <proof.json> --offline    # math only, no network, no date
 $ sellat-verify <file> <proof.json> --rpc=<url>  # use your own JSON-RPC node
 ```
 
-Exit code `0` means every check passed. By default the on-chain check uses
+Exit code `0` means every check passed. Only the on-chain check proves a
+date, the block's time as the chain states it; `--offline` says so and states
+none. By default the on-chain check uses
 public RPC endpoints; pass `--rpc=` to use a node you control, so the
 verification trusts nothing chosen by anyone else.
 
@@ -81,6 +83,12 @@ As a library:
 ```js
 import { verifyProofOffline, checkAnchorOnChain } from 'sellat-verify';
 ```
+
+The proven time is `checkAnchorOnChain(...).blockTimestamp`, read from the
+anchoring block. Never present the proof's own `block_timestamp` as proven:
+a `proof.json` is plain text, and since 0.2.0 a proof whose
+`block_timestamp` differs from the block's time fails the on-chain check.
+`verifyProofOffline` proves no date at all.
 
 ### Verify in CI
 
